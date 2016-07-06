@@ -1,6 +1,5 @@
 /****************************************************************
  * 		 knockoutjs的实现
- * 		 实现第一步：双向绑定
  * 		 @by bluemind
  *****************************************************************/
 
@@ -13,6 +12,8 @@ ko.observable = function (initialValue) {
 			// set 方法
 			_latestValue = newValue;
 			observable.notifySubscribers(_latestValue);
+		} else {
+			ko.dependencyDetection.registerDependency(observable);
 		}
 		return _latestValue;
 	}
@@ -34,6 +35,26 @@ ko.subscribable = function () {
 		}
 	};
 }
+
+ko.dependencyDetection = (function () {
+    var _detectedDependencies = [];
+
+    return {
+        begin: function () {
+            _detectedDependencies.push([]);
+        },
+
+        end: function () {
+            return _detectedDependencies.pop();
+        },
+
+        registerDependency: function (subscribable) {
+            if (_detectedDependencies.length > 0) {
+                _detectedDependencies[_detectedDependencies.length - 1].push(subscribable);
+            }
+        }
+    };
+})();
 
 /** 绑定 **/
 var bindingAttributeName = "data-bind";
