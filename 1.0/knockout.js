@@ -1,15 +1,22 @@
+/****************************************************************
+ * 		 knockoutjs的实现
+ * 		 实现第一步：双向绑定
+ * 		 @by bluemind
+ *****************************************************************/
+
 var ko = window.ko = {};
 ko.observable = function (initialValue) {
 	var _latestValue = initialValue;
 
 	function observable(newValue) {
 		if (arguments.length > 0) {
+			// set 方法
 			_latestValue = newValue;
 			observable.notifySubscribers(_latestValue);
 		}
 		return _latestValue;
 	}
-
+	// 继承ko.subscribable的方法
 	ko.subscribable.call(observable);
 	return observable;
 }
@@ -28,6 +35,7 @@ ko.subscribable = function () {
 	};
 }
 
+/** 绑定 **/
 var bindingAttributeName = "data-bind";
 ko.bindingHandlers = {};
 
@@ -46,6 +54,7 @@ ko.bindingHandlers.value = {
 	}
 };
 
+// 绑定的入口
 ko.applyBindingsToNode = function (viewModel, node) {
 	var isFirstEvaluation = true;
 	function evaluate() {
@@ -54,12 +63,11 @@ ko.applyBindingsToNode = function (viewModel, node) {
 			if (ko.bindingHandlers[bindingKey]) {
 				if (isFirstEvaluation && typeof ko.bindingHandlers[bindingKey].init == "function") {
 					ko.bindingHandlers[bindingKey].init(node, parsedBindings[bindingKey]);
-					parsedBindings[bindingKey].subscribe(evaluate);
 				}
 				if (typeof ko.bindingHandlers[bindingKey].update == "function") {
 					ko.bindingHandlers[bindingKey].update(node, parsedBindings[bindingKey]);
 				}
-				if (isFirstEvaluation) parsedBindings[bindingKey].subscribe(evaluate);
+				if (isFirstEvaluation) parsedBindings[bindingKey].subscribe(evaluate);// observe注册回调
 			}
 		}
 	}
@@ -68,6 +76,7 @@ ko.applyBindingsToNode = function (viewModel, node) {
 	isFirstEvaluation = false;
 };
 
+// 解析html
 function parseBindingAttribute(attributeText, viewModel) {
 	var bindings = {}, tmp = attributeText.split(',');
 	for(var i = 0;i < tmp.length;i++) {
