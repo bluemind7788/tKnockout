@@ -13,6 +13,7 @@ ko.observable = function (initialValue) {
 			_latestValue = newValue;
 			observable.notifySubscribers(_latestValue);
 		} else {
+			// get 方法
 			ko.dependencyDetection.registerDependency(observable);
 		}
 		return _latestValue;
@@ -36,6 +37,35 @@ ko.subscribable = function () {
 	};
 }
 
+// 计算属性
+ko.dependentObservable = function(evaluatorFunction, evaluatorFunctionTarget) {
+	var _lastValue,_isFirstEvaluation = true;
+	function evaluate() {
+		_isFirstEvaluation && ko.dependencyDetection.begin();
+		_lastValue = evaluatorFunctionTarget ? evaluatorFunction.call(evaluatorFunctionTarget) : evaluatorFunction();
+		_isFirstEvaluation && replaceSubscriptionsToDependencies(ko.dependencyDetection.end());
+		
+		dependentObservable.notifySubscribers(_lastValue);
+		_isFirstEvaluation = false;
+	}
+	
+	function replaceSubscriptionsToDependencies(dependencies) {
+		dependencies.forEach(function(dependence) {
+			dependence.subscribe(evaluate);
+		});
+	}
+	
+	function dependentObservable() {
+		ko.dependencyDetection.registerDependency(dependentObservable);
+		return _lastValue;
+	}
+	ko.subscribable.call(dependentObservable);
+	evaluate();
+	
+	return dependentObservable;
+}
+
+// 依赖收集的收集暂存箱
 ko.dependencyDetection = (function () {
     var _detectedDependencies = [];
 
@@ -78,22 +108,20 @@ ko.bindingHandlers.value = {
 // 绑定的入口
 ko.applyBindingsToNode = function (viewModel, node) {
 	var isFirstEvaluation = true;
-	function evaluate() {
-		var parsedBindings = parseBindingAttribute(node.getAttribute(bindingAttributeName), viewModel);
-		for (var bindingKey in parsedBindings) {
-			if (ko.bindingHandlers[bindingKey]) {
-				if (isFirstEvaluation && typeof ko.bindingHandlers[bindingKey].init == "function") {
-					ko.bindingHandlers[bindingKey].init(node, parsedBindings[bindingKey]);
+	new ko.dependentObservable(function () {
+			var parsedBindings = parseBindingAttribute(node.getAttribute(bindingAttributeName), viewModel);
+			for (var bindingKey in parsedBindings) {
+				if (ko.bindingHandlers[bindingKey]) {
+					if (isFirstEvaluation && typeof ko.bindingHandlers[bindingKey].init == "function") {
+						ko.bindingHandlers[bindingKey].init(node, parsedBindings[bindingKey]);
+					}
+					if (typeof ko.bindingHandlers[bindingKey].update == "function") {
+						ko.bindingHandlers[bindingKey].update(node, parsedBindings[bindingKey]);
+					}
 				}
-				if (typeof ko.bindingHandlers[bindingKey].update == "function") {
-					ko.bindingHandlers[bindingKey].update(node, parsedBindings[bindingKey]);
-				}
-				if (isFirstEvaluation) parsedBindings[bindingKey].subscribe(evaluate);// observe注册回调
 			}
-		}
-	}
+		}, null);
 	
-	evaluate();
 	isFirstEvaluation = false;
 };
 

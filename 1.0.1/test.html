@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ko implement</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+</head>
+<body>
+	
+    <p>First name: <input id="name1" data-bind="value:firstName" /></p>
+    <p>Last name: <input id="name2" data-bind="value:lastName" /></p>
+    <h2>Hello, <span id="name3" data-bind="text:fullName"></span>!</h2>
+	
+	<script src="knockout.js"></script>
+	<script>
+		var myViewModel = { };
+        myViewModel.firstName = ko.observable("Bob");
+        myViewModel.lastName = ko.observable("Smith");
+        myViewModel.fullName = ko.dependentObservable(function () {
+            return this.firstName() + " " + this.lastName();
+		}, myViewModel)
+		ko.applyBindingsToNode(myViewModel, document.getElementById('name1'));
+		ko.applyBindingsToNode(myViewModel, document.getElementById('name2'));
+		ko.applyBindingsToNode(myViewModel, document.getElementById('name3'));
+	</script>
+
+</body>
+</html>
