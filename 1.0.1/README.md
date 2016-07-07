@@ -111,5 +111,5 @@ dependencies.forEach(function(dependence) {
 	});
 }
 ```
-**计算属性和依赖收集算是mvvm中的核心和难点，具体实现代码和测试例子见：[https://github.com/bluemind7788/myknockout/tree/master/1.1](https://github.com/bluemind7788/myknockout/tree/master/1.1)**
+**计算属性和依赖收集算是mvvm中的核心和难点，具体实现代码和测试例子见：[https://github.com/bluemind7788/myknockout/tree/master/1.0.1](https://github.com/bluemind7788/myknockout/tree/master/1.0.1)**
 

@@ -80,4 +80,4 @@ ko.applyBindingsToNode = function (viewModel, node) {
 };
 
 ```
-完整的代码和测试例子见[https://github.com/bluemind7788/myknockout/tree/master/1.0](https://github.com/bluemind7788/myknockout/tree/master/1.0)
+完整的代码和测试例子见[https://github.com/bluemind7788/myknockout/tree/master/1.0.0](https://github.com/bluemind7788/myknockout/tree/master/1.0.0)
