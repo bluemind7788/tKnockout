@@ -1,0 +1,3 @@
+ko.jqueryTmplTemplateEngine = function() {
+	
+}

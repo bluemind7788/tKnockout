@@ -9,10 +9,10 @@ ko.applyBindingsToNode = function (viewModel, node) {
 			for (var bindingKey in parsedBindings) {
 				if (ko.bindingHandlers[bindingKey]) {
 					if (isFirstEvaluation && typeof ko.bindingHandlers[bindingKey].init == "function") {
-						ko.bindingHandlers[bindingKey].init(node, parsedBindings[bindingKey]);
+						ko.bindingHandlers[bindingKey].init(node, parsedBindings[bindingKey], viewModel);
 					}
 					if (typeof ko.bindingHandlers[bindingKey].update == "function") {
-						ko.bindingHandlers[bindingKey].update(node, parsedBindings[bindingKey]);
+						ko.bindingHandlers[bindingKey].update(node, parsedBindings[bindingKey], viewModel);
 					}
 				}
 			}
@@ -26,7 +26,7 @@ function parseBindingAttribute(attributeText, viewModel) {
 	var bindings = {}, tmp = attributeText.split(',');
 	for(var i = 0;i < tmp.length;i++) {
 		var names = tmp[0].split(':'), handlerName = names[0], observableName = names[1];
-		bindings[handlerName] = viewModel[observableName];
+		bindings[handlerName] = viewModel[observableName] ? viewModel[observableName] : observableName;
 	}
 	return bindings;
 }
