@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ko implement</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+</head>
+<body>
+	
+    <select id="select1" multiple="multiple" style="width: 200px" data-bind="options:items"></select>
+	<button onclick="addItem()">添加</button>
+	<button onclick="delLastItem()">删除最后一项</button>
+	<button onclick="reverse()">反转</button>
+	
+	<script src="namespace.js"></script>
+	<script src="subscrible.js"></script>
+	<script src="observable.js"></script>
+	<script src="dependecyDetection.js"></script>
+	<script src="dependentObservable.js"></script>
+	<script src="observableArray.js"></script>
+	<script src="defaultBinding.js"></script>
+	<script src="bindingAttributeSyntax.js"></script>
+	<script>
+		var myViewModel = { };
+        myViewModel.items = ko.observableArray(["Alpha", "Beta", "Gamma"])
+		ko.applyBindingsToNode(myViewModel, document.getElementById('select1'));
+		function addItem() {
+			myViewModel.items.push('Added');
+		}
+		function delLastItem() {
+			myViewModel.items.pop();
+		}
+		function reverse() {
+			myViewModel.items.reverse();
+		}
+	</script>
+
+</body>
+</html>
