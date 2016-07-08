@@ -58,3 +58,5 @@ observable.valueHasMutated = function () {
 ```
 ### 
 具体的实现和例子，参照[https://github.com/bluemind7788/myknockout/tree/master/1.0.2](https://github.com/bluemind7788/myknockout/tree/master/1.0.2)
+
+![image](https://github.com/bluemind7788/myknockout/tree/master/1.0.2/1.png)
