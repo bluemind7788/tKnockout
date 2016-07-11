@@ -17,8 +17,15 @@ ko.observable = function (initialValue) {
 		}
 		return _latestValue;
 	}
+	observable.__ko_proto__ = ko.observable;
 	observable.valueHasMutated = function () { observable.notifySubscribers(_latestValue); }
 	// 继承ko.subscribable的方法
 	ko.subscribable.call(observable);
 	return observable;
+}
+
+ko.isObservable = function(instance) {
+	if(instance == null || instance == undefined || instance.__ko_proto__ == undefined) return false;
+	if(instance.__ko_proto__ == ko.observable) return true;
+	return ko.isObservable(instance.__ko_proto__);
 }

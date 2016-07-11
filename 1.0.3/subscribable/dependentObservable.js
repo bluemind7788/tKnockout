@@ -20,8 +20,10 @@ ko.dependentObservable = function(evaluatorFunction, evaluatorFunctionTarget) {
 		ko.dependencyDetection.registerDependency(dependentObservable);
 		return _lastValue;
 	}
+	dependentObservable.__ko_proto__ = ko.dependentObservable;
 	ko.subscribable.call(dependentObservable);
 	evaluate();
 	
 	return dependentObservable;
 }
+ko.dependentObservable.__ko_proto__ = ko.observable;

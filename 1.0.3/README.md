@@ -1,63 +1,88 @@
-## 更多的绑定
+## 自己动手写Knockoutjs - 判断observable对象的方法和更多的绑定
 ### 1. 测试用例
-``` vbscript-html
-<select id="select1" multiple="multiple" style="width: 200px" data-bind="options:items"></select>
-<button onclick="addItem()">添加</button>
-<button onclick="delLastItem()">删除最后一项</button>
-<button onclick="reverse()">反转</button>
+[https://github.com/bluemind7788/myknockout/blob/master/1.0.3/test.html](https://github.com/bluemind7788/myknockout/blob/master/1.0.3/test.html)
+### 2. 判断一个对象是否是observable、dependentObservable
 
-<script src="knockout.js"></script>
-<script>
-	var myViewModel = { };
-       myViewModel.items = ko.observableArray(["Alpha", "Beta", "Gamma"])
-	ko.applyBindingsToNode(myViewModel, document.getElementById('select1'));
-	function addItem() {
-		myViewModel.items.push('Added');
-	}
-	function delLastItem() {
-		myViewModel.items.pop();
-	}
-	function reverse() {
-		myViewModel.items.reverse();
-	}
-</script>
-```
-### 2. 可监控数组的定义
-不同于一般的`observable`对象，可监控数组需要有更多的操作api，如push、pop等。这样，我们可以通过继承`observable`，然后再加入扩展的方法。
+observable都是function对象，通过typeof、instanceof并不能判断出来。   
+dependentObservable也是observable，需要判断为true。   
+参考javascript的原型链，我们为observable添加一个__ko_proto__的属性，它来标识一个observable对象，它指向ko.observable。ko.observable也加一个__ko_proto__的属性，它指向它的父。
+
+observable添加
 ``` javascript
-ko.observableArray = function(initialValues) {
-	var result = new ko.observable(initialValues);
-	return result;
+observable.__ko_proto__ = ko.observable;
 }
 ```
-### 3. 扩展方法的实现
-通过result()可以得到原生的数组对象，在扩展方法里需要做两件事：操作原生数组；通知subscribtiones。
+dependentObservable添加
 ``` javascript
-["pop", "push", "reverse", "shift", "sort", "splice", "unshift"].forEach(function(methodName) {
-	result[methodName] = function() {
-		var underlyingArray = result();
-		var methodCallResult = underlyingArray[methodName].apply(underlyingArray, arguments);
-		result.valueHasMutated();
-	    return methodCallResult;
-	}
-});
+dependentObservable.__ko_proto__ = ko.dependentObservable;
+}
+ko.dependentObservable.__ko_proto__ = ko.observable;
 ```
-`valueHasMutated`的实现放在`observable`中。
+判断observable的方法
 ``` javascript
-observable.valueHasMutated = function () { 
-	observable.notifySubscribers(_latestValue); 
+ko.isObservable = function(instance) {
+	if(instance == null || instance == undefined || instance.__ko_proto__ == undefined) return false;
+	if(instance.__ko_proto__ == ko.observable) return true;
+	return ko.isObservable(instance.__ko_proto__);
 }
 ```
-对于像`slice`这样的方法，当其被调用时是不需要发出通知的。
+### 3. click绑定
 ``` javascript
-['slice'].forEach(function(methodName) {
-	result[methodName] = function() {
-			var underlyingArray = result();
-	           return underlyingArray[methodName].apply(underlyingArray, arguments);
+ko.bindingHandlers.click = {
+	init: function(element, value, viewModel) {
+		ko.utils.registerEventHandler(element, 'click', function(event) {
+			try{
+				value.call(viewModel);
+			} finally {
+				if(event.preventDefault) {
+					event.preventDefault();
+				} else {
+					event.returnValue = false;
+				}
+			}
+		})
+	}
+};
+```
+registerEventHandler是一个通用化的方法，我们放到utils里面。
+
+``` javascript
+registerEventHandler: function(element, eventType, handler) {
+	if(element.addEventListener) {
+		element.addEventListener(eventType, handler, false);
+	} else if(element.attachEvent) {
+		element.addEventListener('on' + eventType, function(event) {
+			handler.call(element, event);
+		});
+	}
+}
+```
+### 4. css绑定
+``` javascript
+ko.utils.css = {
+	update: function(element, value, viewModel) {
+		value = value || {};
+		for(var className in value) {
+			var shouldHasClass = value[className];
+			ko.utils.toggleDomNodeCssClass(element, className, shouldHaveClass);
+			
 		}
-});
+	}
+}
+```
+toggleDomNodeCssClass需要用类似于jquery操作样式常用的方法hasClass、addClass、removeClass等方法，我们都把他们加到utils里面，具体看源码。
+
+``` javascript
+toggleDomNodeCssClass : function(element, className, shouldHaveClass) {
+	var hasClass = ko.utils.hasClass(element, className);
+	if(shouldHaveClass && !hasClass) {
+		ko.utils.addClass(element, className)
+	} else if(!shouldHaveClass && hasClass){
+		ko.utils.removeClass(element, className)
+	}
+}
 ```
 ### 
-具体的实现和例子，参照[https://github.com/bluemind7788/myknockout/tree/master/1.0.2](https://github.com/bluemind7788/myknockout/tree/master/1.0.2)
+**具体的实现和例子，参照[https://github.com/bluemind7788/myknockout/tree/master/1.0.3](https://github.com/bluemind7788/myknockout/tree/master/1.0.3)**
 
 
