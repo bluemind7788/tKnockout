@@ -1,3 +1,4 @@
+## 自己动手写Knockoutjs - 可监控数组
 ### 1. 测试用例
 ``` vbscript-html
 <select id="select1" multiple="multiple" style="width: 200px" data-bind="options:items"></select>
