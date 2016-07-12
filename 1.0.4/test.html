@@ -26,8 +26,8 @@
 	        {{each people}}
 	            <li>
 	                <div>
-	                    ${ name } has <span data-bind="text: children().length">&nbsp;</span> children:
-	                    <span class="renderTime" data-bind="visible: showRenderTimes">(person rendered at ${ new Date().getSeconds() })</span>
+	                    ${ name } has <span data-bind="text:children().length">&nbsp;</span> children:
+	                    <span class="renderTime" data-bind="visible:showRenderTimes">(person rendered at ${ new Date().getSeconds() })</span>
 	                </div>
 	            </li>
 	        {{/each}}

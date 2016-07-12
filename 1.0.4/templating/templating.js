@@ -7,5 +7,6 @@ ko.bindingHandlers.template = {
 				element.appendChild(renderedNode)
 			})
 		});
+		
 	}
 }
