@@ -21,6 +21,14 @@ ko.applyBindingsToNode = function (viewModel, node) {
 	isFirstEvaluation = false;
 };
 
+ko.applyBindings = function(viewModel, node) {
+	node = node ? node : document.body;
+	var elesWithBindingAttribute = ko.utils.getElementsHavingAttribute(node, bindingAttributeName);
+	elesWithBindingAttribute.forEach(function(ele) {
+		ko.applyBindingsToNode(viewModel, ele);
+	});
+}
+
 // 解析html
 function parseBindingAttribute(attributeText, viewModel) {
 	var bindings = {}, tmp = attributeText.split(',');

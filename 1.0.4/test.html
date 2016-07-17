@@ -11,6 +11,7 @@
 	<script type="text/javascript" src="lib/jquery-1.4.2.js" ></script>
 	<script type="text/javascript" src="lib/jquery.tmpl.js" ></script>
 	<script src="namespace.js"></script>
+	<script src="utils.js"></script>
 	<script src="subscribable/subscrible.js" id="xxx"><h1>pppp</h1></script>
 	<script src="subscribable/observable.js"></script>
 	<script src="subscribable/dependecyDetection.js"></script>
@@ -53,7 +54,7 @@
             showRenderTimes : ko.observable(false)
         };
 
-        ko.applyBindingsToNode(viewModel, document.getElementById('test1'));
+        ko.applyBindings(viewModel);
 	</script>
 
 </body>

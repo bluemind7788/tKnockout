@@ -5,7 +5,9 @@ ko.bindingHandlers.template = {
 			var renderedNodesArray = $.tmpl(document.getElementById(templateId).text, viewModel);
 			renderedNodesArray.forEach(function(renderedNode) {
 				element.appendChild(renderedNode)
+				ko.applyBindings(viewModel, renderedNode)
 			})
+			
 		});
 		
 	}
